@@ -53,6 +53,8 @@ RUN python3 -m pip install --no-cache-dir decord
 RUN python3 -m pip install --no-cache-dir flair
 RUN python3 -m pip install --no-cache-dir nltk
 
+RUN python3 -m pip install --no-cache-dir pynvml
+
 # When installing in editable mode, `transformers` is not recognized as a package.
 # this line must be added in order for python to be aware of transformers.
 RUN cd transformers && python3 setup.py develop

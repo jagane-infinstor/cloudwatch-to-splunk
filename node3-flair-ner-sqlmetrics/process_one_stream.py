@@ -4,6 +4,12 @@ articles = ['a', 'an', 'the']
 demonstrative_pronouns = ['this', 'that', 'these', 'those']
 misc = ['there']
 
+def print_gpu_utilization():
+    nvmlInit()
+    handle = nvmlDeviceGetHandleByIndex(0)
+    info = nvmlDeviceGetMemoryInfo(handle)
+    print(f"GPU memory occupied: {info.used//1024**2} MB.")
+
 def quote_once(s):
     return quote(s, safe="").replace("%", "$")
 
@@ -208,8 +214,10 @@ def process_one_log_stream_general(client, ner, group_name, stream_name, first_e
     print(f"  start_time_epochs={start_time_epochms}, end_time_epochs={end_time_epochms}", flush=True)
 
     print('------------------------------ Begin Creating Huggingface SequenceTagger ------------------', flush=True)
+    print_gpu_utilization()
     tagger = SequenceTagger.load("flair/chunk-english").to('cuda')
     print('------------------------------ After Creating Huggingface SequenceTagger ------------------', flush=True)
+    print_gpu_utilization()
 
     total_len = 0
     all_messages = {}
@@ -325,6 +333,7 @@ try:
     from nltk.corpus import stopwords
     import re
     import time
+    from pynvml import *
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--access_key_id', help='aws access key id', required=True)
@@ -361,16 +370,20 @@ try:
         print(f'Overriding Periodic Run Start Time using parameter. New Start Time={start_time}')
 
     print('------------------------------ Begin Loading Huggingface ner model ------------------', flush=True)
+    print_gpu_utilization()
     try:
         tokenizer = AutoTokenizer.from_pretrained("Jean-Baptiste/roberta-large-ner-english")
         model = AutoModelForTokenClassification.from_pretrained("Jean-Baptiste/roberta-large-ner-english").to('cuda')
     except Exception as err:
         print('Caught ' + str(err) + ' while loading ner model')
     print('------------------------------ After Loading Huggingface ner model ------------------', flush=True)
+    print_gpu_utilization()
 
     print('------------------------------ Begin Creating Huggingface ner pipeline ------------------', flush=True)
+    print_gpu_utilization()
     ner = pipeline('ner', model=model, tokenizer=tokenizer, aggregation_strategy="simple", device="cuda:0")
     print('------------------------------ After Creating Huggingface ner pipeline ------------------', flush=True)
+    print_gpu_utilization()
 
     region = 'us-east-1'
     client = boto3.client('logs', region_name=region, aws_access_key_id=args.access_key_id, aws_secret_access_key=args.secret_access_key)
