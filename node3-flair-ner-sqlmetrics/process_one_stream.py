@@ -167,6 +167,7 @@ def process_one_log_stream_sql(client, ner, group_name, stream_name, first_event
             print(f"unique_key={key}: Number of lines with this unique key={len(val)}")
             for ov in val:
                 print(f"  line={ov[1]}, Numbers={ov[2]}, Timestamps={ov[3]}")
+                break # print just the first entry
 
         print(f"Before applying NER to metrics search keys")
         before = datetime.utcnow()
