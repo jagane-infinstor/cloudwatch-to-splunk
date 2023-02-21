@@ -26,7 +26,7 @@ def aws_cloudwatch_url(region, log_group, log_stream, dt):
     ])
 
 def add_log_line(dt, msg, person, all_messages, log_group, log_stream, region):
-    print(f"add_log_line: Entered. date={dt}, person={person}, msg={msg}, log_group={log_group}, log_stream={log_stream}")
+    #print(f"add_log_line: Entered. date={dt}, person={person}, msg={msg}, log_group={log_group}, log_stream={log_stream}")
     cw_url = aws_cloudwatch_url(region, log_group, log_stream, dt)
     if person in all_messages:
         all_messages[person].append((dt.timestamp(), cw_url, msg))
@@ -55,7 +55,7 @@ def do_flair(tagger, tm, msg, all_messages, group_name, stream_name, region):
 def extract_path(msg):
     # e.g. blah.blah.blah, 'path': '/2.0/mlflow/parallels/list-periodicruns',
     # e.g. blah.blah.blah, "path":"/customerinfo",
-    print(f"extract_path: Entered. msg={msg}", flush=True)
+    #print(f"extract_path: Entered. msg={msg}", flush=True)
     match = re.search("path' *: *'([^']*)", msg)
     if match:
         print("found", match.group(1))
@@ -108,7 +108,7 @@ def extract_metrics(event, unique_keys):
                 except Exception as ex:
                     text_strings.append(part)
     log_key = ' '.join(text_strings)
-    print(log_key, numbers, timestamps)
+    #print(log_key, numbers, timestamps)
     if log_key not in unique_keys:
         unique_keys[log_key] = [(event['timestamp'], event['message'], numbers, timestamps)]
     else:
@@ -240,7 +240,7 @@ def process_one_log_stream_general(client, ner, group_name, stream_name, first_e
         for idx, event in enumerate(events):
             msg = event['message']
             tm = datetime.fromtimestamp(event['timestamp']/1000, timezone.utc)
-            print(f"Processing msg={msg}")
+            # print(f"Processing msg={msg}")
             tlen = do_flair(tagger, tm, msg, all_messages, group_name, stream_name, region)
             total_len = total_len + tlen
             # run NER through every line
